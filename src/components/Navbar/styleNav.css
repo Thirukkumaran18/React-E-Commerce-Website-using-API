@@ -1,0 +1,18 @@
+
+
+.title{
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+}
+.image{
+    border-radius: 50%;
+    margin-right: 10px;
+    
+}
+.cart{
+    padding-bottom: 10px;
+}
+.grow{
+    flex-grow: 1;
+}

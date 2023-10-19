@@ -1,0 +1,18 @@
+.cartfooter{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+}
+.cartbuttons {
+    display: flex;
+    gap: 10px;
+}
+.price{
+    font-weight: bold;
+    
+}.carttitle {
+    font-weight: bold !important ;
+    font-family: sans-serif !important;
+    
+}
+ 
