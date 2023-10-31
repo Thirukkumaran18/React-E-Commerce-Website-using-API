@@ -4,6 +4,8 @@ import Navbar from './components/Navbar/Navbar'
 import { Commercefile } from './lib/Commercefile'
 import Cart from './components/Cart/Cart';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Checkout from './components/CheckoutForm/Checkout/Checkout';
+
 
 
 // import { Cart } from '@chec/commerce.js/features/cart'
@@ -28,14 +30,28 @@ const App = () => {
       setIsCartLoaded(true);
   }
 
-  const handleAddToCart = async(ProductId, quantity) => {
-    const item = await Commercefile.cart.add(ProductId, quantity);
-    setCart(item);
-  }
+  const handleAddToCart = async (productId, quantity) => {
+    try {
+        const item = await Commercefile.cart.add(productId, quantity);
+        setCart(item);
+    } catch (error) {
+        console.error('Error adding item to cart:', error);
+    }
+}
 
   const updateCartQuantity = async (productId, quantity) => {
-    const response = Commercefile.cart.update(productId, quantity);
+    const response = await Commercefile.cart.update(productId, {quantity});
     setCart(response);
+  }
+
+  const removeFromCart = async (productId) => {
+    const response = await Commercefile.cart.remove(productId);
+    setCart(response);
+  }
+
+  const emptyCart = async () => {
+    const response = await Commercefile.cart.empty();
+    setCart(response)
   }
 
   useEffect(() => {
@@ -56,9 +72,15 @@ const App = () => {
         <Navbar totalitems={cart.total_items&& cart.total_items } />
         <Routes>
           <Route path="/" element={<Products products={products} onAddToCart={handleAddToCart} />} />
-          <Route path="/cart" element={isCartLoaded ? <Cart cart={cart} 
-            updateCartQuantity = {updateCartQuantity}
-          /> : <div>Loading...</div>} />
+          <Route path="/cart" 
+              element={isCartLoaded ? 
+              <Cart cart={cart} 
+              updateCartQuantity = {updateCartQuantity}
+              removeFromCart={removeFromCart}
+              emptyCart={emptyCart}
+              /> : <div>Loading...</div>} 
+          />
+          <Route path='/checkout' element={<Checkout cart={cart} />} />
         </Routes>
       </div>
     </Router>

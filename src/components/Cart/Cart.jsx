@@ -1,10 +1,10 @@
 import React from 'react'
-import { useState } from 'react';
 import { Container , Typography, Button, Grid } from '@material-ui/core'
 import './cart.css'
 import CartItem from './CartItem/CartItem';
+import { Link } from 'react-router-dom';
 
-const Cart = ({cart , updateCartQuantity}) => {
+const Cart = ({cart , updateCartQuantity, removeFromCart, emptyCart}) => {
     const isEmpty = !cart && cart.line_items ? cart.line_items.length : 0;
     
   
@@ -19,13 +19,13 @@ const Cart = ({cart , updateCartQuantity}) => {
         )
     }
 
-    let subtotal = cart.subtotal.raw
+    let subtotal = cart.subtotal.formatted_with_symbol
 
     const FilledCart = () => {
         return (
 
         <>
-           {console.log(cart)}
+          
             <Grid container spacing={3}>
                 {   
                       cart.line_items ? 
@@ -34,7 +34,8 @@ const Cart = ({cart , updateCartQuantity}) => {
                                 <CartItem 
                                     item={item} 
                                     updateCartQuantity={updateCartQuantity} 
-                                     
+                                    removeFromCart={removeFromCart}
+                                    emptyCart={emptyCart} 
                                 />
                             </Grid>
         
@@ -48,8 +49,8 @@ const Cart = ({cart , updateCartQuantity}) => {
                     
                 </Typography>
                 <div className='cartbuttons'>
-                    <Button type='button' color='secondary' variant='contained' size='large'>Empty Cart</Button>
-                    <Button type='button' color='primary' variant='contained' size='large'>Checkout</Button>
+                    <Button type='button' color='secondary' variant='contained' size='large' onClick={emptyCart}>Empty Cart</Button>
+                    <Button component={Link} to='/checkout' type='button' color='primary' variant='contained' size='large'>Checkout</Button>
                 </div>
             </div>
         </>
