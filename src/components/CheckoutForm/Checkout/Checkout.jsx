@@ -3,15 +3,18 @@ import { Paper, Stepper, StepLabel, Step, Typography, CircularProgress, Divider,
 import AddressForm from '../AddressForm'
 import PaymentForm from '../PaymentForm'
 import { Commercefile } from '../../../lib/Commercefile'
+import { Link } from 'react-router-dom'
 
 
 const steps = ['Shipping Address', 'Payment details']
 
 
-const Checkout = ({cart}) => {
+const Checkout = ({cart, order, handleCaptureCheckout, error, refreshCart}) => {
 
   const [activeStep , setActivestep] = useState(0)
   const [checkoutToken, setcheckoutToken] = useState(null);
+  const [isFinished, setisFinished] = useState(false)
+  const [shippingData, setshippingData] = useState({})
 
   useEffect(() => {
       const generateTokenId = async () => {
@@ -20,7 +23,7 @@ const Checkout = ({cart}) => {
           
           setcheckoutToken(token);
         } catch (error) {
-          console.log(error)
+          
         }
 
       }
@@ -29,14 +32,62 @@ const Checkout = ({cart}) => {
 
   },[cart]);
 
-  const Confirmation = () => (
+  const nextStep = () => setActivestep((prevActiveStep) => prevActiveStep + 1) 
+  const backStep = () => setActivestep((prevActiveStep) => prevActiveStep -1) 
+
+  const next = (data) => {
+      setshippingData(data)
+      nextStep();
+  }
+
+  const timeOut = () => {
+   setTimeout(() => {
+    setisFinished(true)
+   }, 3000)
+  }
+
+  let Confirmation = () => order.customer ?  (
+    <>
+      <div>
+      <Typography variant='h5'>Thank you for the purchase , {order.customer.firstname} </Typography>
+      <Divider />
+      </div>
+      <br />
+      <Button component={Link} to="/" variant='outlined' >Back to home</Button>
+    </>
+  ) : isFinished ? (
+    <>
+      <Typography variant='h6'>Thank you for the purchase </Typography>
+      <Button component={Link} to="/" variant='outlined' 
+        onClick={() => refreshCart()}
+      >Back to home</Button>
+      
+    </>
+    
+  ) : <>
     <div>
-      confirmation
+          <CircularProgress />
+          <br />
+          <Button component={Link} to="/" variant='outlined' >Back to home</Button>
+
     </div>
-  )
+  </> 
+
+  if(error){
+    <>
+      <Typography variant='h5' >Error: {error}</Typography>
+    </>
+  }
 
   const Form  = () => (
-    activeStep === 0 ? <AddressForm checkoutToken={checkoutToken}/> : <PaymentForm />
+    activeStep === 0 ? <AddressForm checkoutToken={checkoutToken} next={next} /> : 
+    <PaymentForm  shippingData={shippingData} 
+        checkoutToken={checkoutToken} 
+        backStep={backStep} 
+        handleCaptureCheckout={handleCaptureCheckout}
+        nextStep={nextStep}
+        timeOut={timeOut}
+    />
   )
 
   return (

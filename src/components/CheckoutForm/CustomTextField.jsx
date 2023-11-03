@@ -9,6 +9,7 @@ const CustomTextField = ({ name, label, required }) => {
     <Grid item xs={12} sm={10} md={8} lg={6} xl={4}>
        <Controller 
             as={TextField}
+            defaultValue=""
             control={control}
             name = {name} 
             label={label}

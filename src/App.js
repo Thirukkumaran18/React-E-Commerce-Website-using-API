@@ -19,6 +19,10 @@ const App = () => {
 
   const [isCartLoaded, setIsCartLoaded] = useState(false);
 
+  const [order, setorder] = useState({})
+
+  const [errorMessage, seterrorMessage] = useState('')
+
   const fetchProducts = async () => {
       const { data } = await Commercefile.products.list();
       setProducts(data);
@@ -54,6 +58,23 @@ const App = () => {
     setCart(response)
   }
 
+  const refreshCart = async () => {
+    const newCart = await Commercefile.cart.refresh();
+    setCart(newCart);
+  }
+
+  const handleCaptureCheckout = async (checkoutTokenId, neworder) => {
+    try {
+
+      const incomingOrder = await Commercefile.checkout.capture(checkoutTokenId, neworder )
+      setorder(incomingOrder)
+      refreshCart()
+      
+    } catch (error) {
+      seterrorMessage(error.data.error.message)
+    }
+  }
+
   useEffect(() => {
     fetchProducts();
     fetchCart();
@@ -80,7 +101,13 @@ const App = () => {
               emptyCart={emptyCart}
               /> : <div>Loading...</div>} 
           />
-          <Route path='/checkout' element={<Checkout cart={cart} />} />
+          <Route path='/checkout' element={
+          <Checkout cart={cart} 
+          order = {order}
+          handleCaptureCheckout={handleCaptureCheckout}
+          error={errorMessage}
+          refreshCart={refreshCart}
+          />} />
         </Routes>
       </div>
     </Router>
